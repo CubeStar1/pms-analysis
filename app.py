@@ -36,7 +36,7 @@ for option in selected_options:
 # Display the merged data of the selected options
 with st.container(border=True):
     st.title('Analysis of Selected Options')
-    st.dataframe(selected_aggregate_data)
+    st.dataframe(selected_aggregate_data.set_index('Parameter'))
 
 
 
@@ -68,6 +68,7 @@ with st.container(border=True):
             # Convert the column to float type
             # Replace 'NRF' with 0 in the column
             selected_monthly_data[column] = selected_monthly_data[column].replace('NRF', 0)
+            selected_monthly_data.fillna(method='ffill', inplace=True)
             selected_monthly_data[column] = selected_monthly_data[column].apply(
                 lambda x: float(x) if isinstance(x, str)  else x)
 
@@ -76,7 +77,7 @@ with st.container(border=True):
         selected_monthly_data = selected_monthly_data[(selected_monthly_data['Date'].dt.date >= date_range[0]) & (selected_monthly_data['Date'].dt.date <= date_range[1])]
 
     with st.container(border=True):
-        st.title('Cumulative Performance of Selected Options')
+        st.title('Cumulative Performance')
 
         selected_monthly_data.set_index('Date', inplace=True)
         # Sort the DataFrame by the 'Date' index
@@ -88,7 +89,10 @@ with st.container(border=True):
             if option in cumulative_data.columns:
                 cumulative_data[option] = pd.to_numeric(cumulative_data[option], errors='coerce')
         # Plot the cumulative sum data
-        st.line_chart(cumulative_data)
+        st.line_chart(cumulative_data, use_container_width=True)
+
+        with st.expander('Show Cumulative Performance Data'):
+            st.dataframe(cumulative_data.transpose().iloc[:, -1])
     with st.container(border=True):
         st.title('Analysis of Selected Options')
         st.dataframe(selected_monthly_data)
