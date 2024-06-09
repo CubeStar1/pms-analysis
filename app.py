@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-
+st.set_page_config(page_title="PMS Performance Data Analysis", page_icon="📈", layout="wide")
 
 
 # Load the data
